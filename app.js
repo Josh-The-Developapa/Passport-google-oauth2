@@ -2,58 +2,30 @@ const express = require("express");
 const session = require("express-session");
 require("dotenv").config();
 const morgan = require("morgan");
-const ejs = require("ejs");
+require("ejs");
 const passport = require("passport");
+const mongoose = require('mongoose');
+const router = require('./routes/router.js');
 require("./auth.js");
-
 const app = express();
 
-app.use(session({ secret: "Joshua" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+app.set('view engine', 'ejs');
+app.use(session({secret: 'Joshua',}));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(router);
 
-function isLoggedIn(req, res, next) {
-  req.user ? next() : res.sendStatus(401);
-}
-
-app.set("view engine", "ejs");
-
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
-
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
-);
-
-app.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    successRedirect: "/protected",
-    failureRedirect: "/auth/failure",
+const dbURL = process.env.dbURL;
+mongoose
+  .connect(dbURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
-);
+  .then(() => console.log('Connected to DB'))
+  .catch((err) => console.log(err));
 
-app.get("/auth/failure", (req, res) => {
-  res.send("Failure");
-});
-
-app.get("/protected", isLoggedIn, (req, res) => {
-  res.render("protected", { displayName: req.user.displayName });
-});
-
-app.get("/logout", (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.send('Logged out');
-});
-
-const PORT = process.env.PORT;
-
-app.listen(PORT, () => {
-  console.log(`Server up and running on ${PORT}`);
-});
+app.listen(5000, () => {
+  console.log("Server up and running")
+})
