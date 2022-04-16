@@ -2,6 +2,7 @@ const passport = require("passport");
 const router = require('express').Router();
 
 function isLoggedIn(req, res, next) {
+    console.log(req.user)
     req.user ? next() : res.sendStatus(401);
 }
 
