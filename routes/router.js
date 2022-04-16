@@ -29,7 +29,7 @@ router.get('/google/callback',
     }));
 
 router.get('/protected', isLoggedIn, (req, res) => {
-    res.render('protected', { name: req.user.name, email: req.user.email });
+    res.render('protected', { name: req.user.name, email: req.user.email, googleId: req.user.googleId });
 });
 
 router.get('/logout', (req, res) => {
