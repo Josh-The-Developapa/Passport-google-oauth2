@@ -27,5 +27,5 @@ mongoose
   .catch((err) => console.log(err));
 
 app.listen(5000, () => {
-  console.log("Server up and running")
+  console.log("Server running at: http://localhost:5000/")
 })
